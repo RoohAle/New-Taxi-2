@@ -1,0 +1,1986 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>New Táxi – Transporte por Aplicativo</title>
+
+  <!-- =============================================
+       FONTES GOOGLE: Syne (títulos) + DM Sans (corpo)
+       ============================================= -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- =============================================
+       ÍCONES: Font Awesome (WhatsApp, setas, etc.)
+       ============================================= -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <style>
+    /* =============================================
+       VARIÁVEIS GLOBAIS DE COR E FONTE
+       ============================================= */
+    :root {
+      --verde:       #2ECC71;
+      --verde-escuro:#1a9e52;
+      --verde-neon:  #39ff84;
+      --preto:       #0a0a0a;
+      --preto-card:  #111111;
+      --preto-borda: #1e1e1e;
+      --branco:      #ffffff;
+      --cinza-claro: #f5f5f5;
+      --cinza-texto: #a0a0a0;
+      --fonte-titulo: 'Syne', sans-serif;
+      --fonte-corpo:  'DM Sans', sans-serif;
+      --raio:        12px;
+      --sombra:      0 8px 40px rgba(0,0,0,0.35);
+    }
+
+    /* =============================================
+       RESET E BASE
+       ============================================= */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--fonte-corpo);
+      background: var(--preto);
+      color: var(--branco);
+      overflow-x: hidden;
+    }
+    a { text-decoration: none; color: inherit; }
+    img { max-width: 100%; display: block; }
+    ul { list-style: none; }
+
+    /* =============================================
+       BARRA DE NAVEGAÇÃO – fixa no topo
+       ============================================= */
+    #navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 6%;
+      background: rgba(10,10,10,0.85);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--preto-borda);
+      transition: background 0.3s;
+    }
+
+    /* Logo na navbar */
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--fonte-titulo);
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--branco);
+    }
+    .nav-logo span { color: var(--verde); }
+
+    /* Logo placeholder (substituir pela img real) */
+    .logo-img {
+      width: 42px;
+      height: 42px;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+    /* Quando não houver imagem, mostra ícone padrão */
+    .logo-fallback {
+      width: 42px; height: 42px;
+      background: var(--verde);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--preto);
+    }
+
+    /* Links de navegação – desktop */
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+    .nav-links a {
+      font-size: 0.92rem;
+      font-weight: 500;
+      color: var(--cinza-texto);
+      transition: color 0.25s;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px; left: 0;
+      width: 0; height: 2px;
+      background: var(--verde);
+      transition: width 0.3s;
+    }
+    .nav-links a:hover,
+    .nav-links a.ativo { color: var(--branco); }
+    .nav-links a:hover::after,
+    .nav-links a.ativo::after { width: 100%; }
+
+    /* Botão "Baixar App" na navbar */
+    .btn-nav {
+      background: var(--verde);
+      color: var(--preto) !important;
+      font-weight: 700 !important;
+      padding: 10px 22px;
+      border-radius: 50px;
+      font-size: 0.88rem !important;
+      transition: background 0.25s, transform 0.2s !important;
+    }
+    .btn-nav::after { display: none !important; }
+    .btn-nav:hover { background: var(--verde-neon) !important; transform: scale(1.04); }
+
+    /* Botão hambúrguer – mobile */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .hamburger span {
+      display: block;
+      width: 26px; height: 2px;
+      background: var(--branco);
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+
+    /* Menu mobile aberto */
+    .hamburger.aberto span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.aberto span:nth-child(2) { opacity: 0; }
+    .hamburger.aberto span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* =============================================
+       HERO – seção inicial
+       ============================================= */
+    #inicio {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 120px 6% 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Fundo gradiente animado */
+    #inicio::before {
+      content: '';
+      position: absolute;
+      top: -200px; right: -200px;
+      width: 700px; height: 700px;
+      background: radial-gradient(circle, rgba(46,204,113,0.18) 0%, transparent 70%);
+      animation: pulse-glow 6s ease-in-out infinite;
+      pointer-events: none;
+    }
+    #inicio::after {
+      content: '';
+      position: absolute;
+      bottom: -100px; left: -100px;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(46,204,113,0.08) 0%, transparent 70%);
+      animation: pulse-glow 8s ease-in-out infinite reverse;
+      pointer-events: none;
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.15); opacity: 0.7; }
+    }
+
+    .hero-conteudo {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Tag pequena acima do título */
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(46,204,113,0.12);
+      border: 1px solid rgba(46,204,113,0.3);
+      color: var(--verde);
+      padding: 6px 16px;
+      border-radius: 50px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      margin-bottom: 24px;
+    }
+    .hero-tag i { font-size: 0.7rem; }
+
+    /* Título principal */
+    .hero-titulo {
+      font-family: var(--fonte-titulo);
+      font-size: clamp(2.4rem, 5vw, 4rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 22px;
+    }
+    .hero-titulo .destaque {
+      color: var(--verde);
+      display: block;
+    }
+
+    .hero-desc {
+      font-size: 1.05rem;
+      color: var(--cinza-texto);
+      line-height: 1.7;
+      margin-bottom: 36px;
+      max-width: 480px;
+    }
+
+    /* Botões de download na hero */
+    .hero-botoes {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .btn-store {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 24px;
+      border-radius: var(--raio);
+      border: 2px solid;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.25s;
+      cursor: pointer;
+    }
+    .btn-store i { font-size: 1.4rem; }
+    .btn-store-android {
+      background: var(--verde);
+      border-color: var(--verde);
+      color: var(--preto);
+    }
+    .btn-store-android:hover {
+      background: var(--verde-neon);
+      border-color: var(--verde-neon);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(46,204,113,0.4);
+    }
+    .btn-store-ios {
+      background: transparent;
+      border-color: rgba(255,255,255,0.25);
+      color: var(--branco);
+    }
+    .btn-store-ios:hover {
+      border-color: var(--verde);
+      color: var(--verde);
+      transform: translateY(-2px);
+    }
+    .btn-store small {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 400;
+      opacity: 0.8;
+      line-height: 1;
+    }
+    .btn-store strong {
+      display: block;
+      font-size: 1rem;
+      line-height: 1.2;
+    }
+
+    /* Estatísticas abaixo dos botões */
+    .hero-stats {
+      display: flex;
+      gap: 32px;
+      margin-top: 40px;
+    }
+    .stat-item strong {
+      display: block;
+      font-family: var(--fonte-titulo);
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--verde);
+    }
+    .stat-item span {
+      font-size: 0.78rem;
+      color: var(--cinza-texto);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Imagem da hero */
+    .hero-imagem {
+      position: relative;
+    }
+    .hero-imagem img {
+      width: 100%;
+      border-radius: 20px;
+      box-shadow: var(--sombra);
+      object-fit: cover;
+      max-height: 520px;
+    }
+    /* Placeholder quando sem imagem */
+    .hero-img-placeholder {
+      width: 100%;
+      height: 480px;
+      background: var(--preto-card);
+      border-radius: 20px;
+      border: 1px solid var(--preto-borda);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      color: var(--cinza-texto);
+    }
+    .hero-img-placeholder i { font-size: 4rem; color: var(--verde); opacity: 0.4; }
+
+    /* Card flutuante sobre a imagem */
+    .card-flutuante {
+      position: absolute;
+      bottom: 24px;
+      left: -24px;
+      background: var(--preto-card);
+      border: 1px solid var(--preto-borda);
+      border-radius: var(--raio);
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: var(--sombra);
+      animation: float 4s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    .card-flutuante .dot {
+      width: 10px; height: 10px;
+      background: var(--verde);
+      border-radius: 50%;
+      animation: blink 1.5s ease-in-out infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+    .card-flutuante p { font-size: 0.82rem; font-weight: 600; }
+    .card-flutuante small { color: var(--cinza-texto); font-size: 0.72rem; }
+
+    /* =============================================
+       SEÇÃO GENÉRICA (wrapper/container)
+       ============================================= */
+    .secao {
+      padding: 90px 6%;
+    }
+    .secao-titulo {
+      font-family: var(--fonte-titulo);
+      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    .secao-titulo span { color: var(--verde); }
+    .secao-subtitulo {
+      text-align: center;
+      color: var(--cinza-texto);
+      max-width: 540px;
+      margin: 0 auto 56px;
+      font-size: 1rem;
+      line-height: 1.7;
+    }
+
+    /* linha decorativa */
+    .linha-deco {
+      width: 56px; height: 3px;
+      background: var(--verde);
+      border-radius: 2px;
+      margin: 0 auto 16px;
+    }
+
+    /* =============================================
+       SEÇÃO RECURSOS / POR QUE ESCOLHER
+       ============================================= */
+    #recursos { background: var(--preto); }
+
+    .grid-recursos {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .card-recurso {
+      background: var(--preto-card);
+      border: 1px solid var(--preto-borda);
+      border-radius: 16px;
+      padding: 32px 28px;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+    .card-recurso:hover {
+      border-color: rgba(46,204,113,0.4);
+      transform: translateY(-4px);
+    }
+    .icone-recurso {
+      width: 52px; height: 52px;
+      background: rgba(46,204,113,0.1);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      color: var(--verde);
+      margin-bottom: 20px;
+    }
+    .card-recurso h3 {
+      font-family: var(--fonte-titulo);
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .card-recurso p {
+      font-size: 0.9rem;
+      color: var(--cinza-texto);
+      line-height: 1.65;
+    }
+
+    /* =============================================
+       SEÇÃO COMO FUNCIONA – passos numerados
+       ============================================= */
+    #como-funciona {
+      background: linear-gradient(135deg, #0d1a12 0%, var(--preto) 100%);
+    }
+
+    .grid-passos {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 32px;
+      max-width: 1100px;
+      margin: 0 auto;
+      position: relative;
+    }
+    /* Linha horizontal entre os passos (desktop) */
+    .grid-passos::before {
+      content: '';
+      position: absolute;
+      top: 36px; left: 10%; right: 10%;
+      height: 2px;
+      background: linear-gradient(to right, transparent, var(--verde), transparent);
+      opacity: 0.3;
+    }
+
+    .passo {
+      text-align: center;
+      position: relative;
+    }
+    .passo-numero {
+      width: 72px; height: 72px;
+      background: rgba(46,204,113,0.12);
+      border: 2px solid rgba(46,204,113,0.35);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--fonte-titulo);
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--verde);
+      margin: 0 auto 20px;
+      transition: background 0.3s, transform 0.3s;
+    }
+    .passo:hover .passo-numero {
+      background: rgba(46,204,113,0.25);
+      transform: scale(1.08);
+    }
+    .passo h3 {
+      font-family: var(--fonte-titulo);
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .passo p { font-size: 0.88rem; color: var(--cinza-texto); line-height: 1.6; }
+
+    /* =============================================
+       SEÇÃO GUINCHO – faixa de destaque
+       ============================================= */
+    #guincho {
+      background: var(--preto-card);
+      border-top: 1px solid var(--preto-borda);
+      border-bottom: 1px solid var(--preto-borda);
+    }
+
+    .guincho-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .guincho-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,200,0,0.1);
+      border: 1px solid rgba(255,200,0,0.3);
+      color: #ffc800;
+      padding: 6px 16px;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .guincho-titulo {
+      font-family: var(--fonte-titulo);
+      font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+    .guincho-titulo span { color: var(--verde); }
+
+    .guincho-desc {
+      color: var(--cinza-texto);
+      font-size: 1rem;
+      line-height: 1.7;
+      margin-bottom: 28px;
+    }
+
+    .guincho-lista {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 36px;
+    }
+    .guincho-lista li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.95rem;
+    }
+    .guincho-lista li i {
+      color: var(--verde);
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    /* Botão WhatsApp Guincho */
+    .btn-wpp {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: #25d366;
+      color: var(--preto);
+      font-weight: 700;
+      padding: 14px 28px;
+      border-radius: 50px;
+      font-size: 1rem;
+      transition: all 0.25s;
+      box-shadow: 0 4px 20px rgba(37,211,102,0.35);
+    }
+    .btn-wpp:hover {
+      background: #1ebe5d;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(37,211,102,0.5);
+    }
+    .btn-wpp i { font-size: 1.3rem; }
+
+    /* Imagem do guincho */
+    .guincho-imagem img {
+      width: 100%;
+      border-radius: 20px;
+      box-shadow: var(--sombra);
+      object-fit: cover;
+      max-height: 420px;
+    }
+    .guincho-img-placeholder {
+      width: 100%;
+      height: 380px;
+      background: rgba(46,204,113,0.05);
+      border: 1px dashed rgba(46,204,113,0.2);
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      color: var(--cinza-texto);
+    }
+    .guincho-img-placeholder i { font-size: 5rem; color: #ffc800; opacity: 0.3; }
+
+    /* =============================================
+       SEÇÃO SEJA MOTORISTA
+       ============================================= */
+    #seja-motorista { background: var(--preto); }
+
+    .motorista-inner {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 60px;
+      align-items: start;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .motorista-info .secao-titulo { text-align: left; }
+    .motorista-info .secao-subtitulo { text-align: left; margin: 0 0 32px; }
+    .motorista-info .linha-deco { margin: 0 0 16px; }
+
+    .beneficios {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .beneficio-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.9rem;
+      color: var(--cinza-texto);
+    }
+    .beneficio-item i { color: var(--verde); margin-top: 2px; }
+
+    /* Formulário de cadastro motorista */
+    .form-motorista {
+      background: var(--preto-card);
+      border: 1px solid var(--preto-borda);
+      border-radius: 20px;
+      padding: 36px 32px;
+    }
+    .form-motorista h3 {
+      font-family: var(--fonte-titulo);
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .form-motorista p {
+      color: var(--cinza-texto);
+      font-size: 0.88rem;
+      margin-bottom: 28px;
+    }
+
+    .form-grupo {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 18px;
+    }
+    .form-grupo label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--cinza-texto);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .form-grupo input,
+    .form-grupo select,
+    .form-grupo textarea {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--preto-borda);
+      color: var(--branco);
+      padding: 12px 16px;
+      border-radius: var(--raio);
+      font-family: var(--fonte-corpo);
+      font-size: 0.92rem;
+      outline: none;
+      transition: border-color 0.25s;
+      width: 100%;
+    }
+    .form-grupo input::placeholder,
+    .form-grupo textarea::placeholder { color: #555; }
+    .form-grupo input:focus,
+    .form-grupo select:focus,
+    .form-grupo textarea:focus { border-color: var(--verde); }
+    .form-grupo select option { background: #1a1a1a; }
+    .form-grupo textarea { resize: vertical; min-height: 90px; }
+
+    .form-linha { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    /* Botão enviar formulário */
+    .btn-primario {
+      width: 100%;
+      background: var(--verde);
+      color: var(--preto);
+      font-family: var(--fonte-corpo);
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 14px;
+      border: none;
+      border-radius: var(--raio);
+      cursor: pointer;
+      transition: background 0.25s, transform 0.2s;
+    }
+    .btn-primario:hover {
+      background: var(--verde-neon);
+      transform: scale(1.02);
+    }
+
+    /* =============================================
+       SEÇÃO SOBRE NÓS
+       ============================================= */
+    #sobre {
+      background: linear-gradient(135deg, #0d1a12 0%, var(--preto) 60%);
+    }
+
+    .sobre-inner {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 60px;
+      align-items: center;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .sobre-texto .secao-titulo { text-align: left; }
+    .sobre-texto .secao-subtitulo { text-align: left; margin: 0 0 28px; }
+    .sobre-texto .linha-deco { margin: 0 0 16px; }
+
+    .sobre-valores {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 32px;
+    }
+    .valor-item {
+      background: rgba(46,204,113,0.06);
+      border: 1px solid rgba(46,204,113,0.15);
+      border-radius: var(--raio);
+      padding: 18px;
+    }
+    .valor-item i {
+      font-size: 1.2rem;
+      color: var(--verde);
+      margin-bottom: 8px;
+    }
+    .valor-item h4 {
+      font-family: var(--fonte-titulo);
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+    }
+    .valor-item p {
+      font-size: 0.82rem;
+      color: var(--cinza-texto);
+      line-height: 1.5;
+    }
+
+    /* Imagem sobre nós */
+    .sobre-imagem img {
+      width: 100%;
+      border-radius: 20px;
+      box-shadow: var(--sombra);
+      object-fit: cover;
+    }
+    .sobre-img-placeholder {
+      width: 100%;
+      height: 380px;
+      background: rgba(46,204,113,0.05);
+      border: 1px dashed rgba(46,204,113,0.2);
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      color: var(--cinza-texto);
+    }
+    .sobre-img-placeholder i { font-size: 4rem; color: var(--verde); opacity: 0.3; }
+
+    /* =============================================
+       SEÇÃO FAQ – perguntas frequentes
+       ============================================= */
+    #faq { background: var(--preto-card); }
+
+    .faq-lista {
+      max-width: 780px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* Accordion item */
+    .faq-item {
+      background: var(--preto);
+      border: 1px solid var(--preto-borda);
+      border-radius: var(--raio);
+      overflow: hidden;
+      transition: border-color 0.25s;
+    }
+    .faq-item.aberto { border-color: rgba(46,204,113,0.35); }
+
+    .faq-pergunta {
+      width: 100%;
+      background: none;
+      border: none;
+      color: var(--branco);
+      font-family: var(--fonte-corpo);
+      font-size: 0.98rem;
+      font-weight: 600;
+      text-align: left;
+      padding: 20px 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .faq-pergunta i {
+      color: var(--verde);
+      transition: transform 0.3s;
+      flex-shrink: 0;
+    }
+    .faq-item.aberto .faq-pergunta i { transform: rotate(45deg); }
+
+    .faq-resposta {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease;
+      padding: 0 24px;
+    }
+    .faq-item.aberto .faq-resposta {
+      max-height: 300px;
+      padding: 0 24px 20px;
+    }
+    .faq-resposta p {
+      color: var(--cinza-texto);
+      font-size: 0.92rem;
+      line-height: 1.7;
+    }
+
+    /* =============================================
+       SEÇÃO CONTATO
+       ============================================= */
+    #contato { background: var(--preto); }
+
+    .contato-inner {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 60px;
+      align-items: start;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .contato-info h3 {
+      font-family: var(--fonte-titulo);
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+    .contato-info p {
+      color: var(--cinza-texto);
+      font-size: 0.95rem;
+      line-height: 1.7;
+      margin-bottom: 32px;
+    }
+
+    .contato-canais {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .canal-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 18px;
+      background: var(--preto-card);
+      border: 1px solid var(--preto-borda);
+      border-radius: var(--raio);
+      transition: border-color 0.25s;
+    }
+    .canal-item:hover { border-color: rgba(46,204,113,0.35); }
+    .canal-item .canal-icone {
+      width: 42px; height: 42px;
+      background: rgba(46,204,113,0.1);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--verde);
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .canal-item .canal-texto strong {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+    .canal-item .canal-texto span {
+      font-size: 0.82rem;
+      color: var(--cinza-texto);
+    }
+
+    /* Formulário de contato */
+    .form-contato {
+      background: var(--preto-card);
+      border: 1px solid var(--preto-borda);
+      border-radius: 20px;
+      padding: 36px 32px;
+    }
+    .form-contato h3 {
+      font-family: var(--fonte-titulo);
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 24px;
+    }
+
+    /* =============================================
+       DOWNLOAD APP – banner final antes do footer
+       ============================================= */
+    #download {
+      background: linear-gradient(135deg, #0d2b1a 0%, #0a1a0f 100%);
+      border-top: 1px solid rgba(46,204,113,0.15);
+      border-bottom: 1px solid rgba(46,204,113,0.15);
+      padding: 80px 6%;
+      text-align: center;
+    }
+    #download .secao-titulo { margin-bottom: 10px; }
+    #download .secao-subtitulo { margin-bottom: 40px; }
+
+    .download-botoes {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .btn-download {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 32px;
+      border-radius: 14px;
+      font-weight: 700;
+      font-size: 1rem;
+      transition: all 0.25s;
+      min-width: 220px;
+    }
+    .btn-download i { font-size: 2rem; }
+    .btn-download small { display: block; font-size: 0.72rem; font-weight: 400; opacity: 0.8; }
+    .btn-download strong { display: block; font-size: 1.1rem; }
+
+    .btn-android-dl {
+      background: var(--verde);
+      color: var(--preto);
+    }
+    .btn-android-dl:hover {
+      background: var(--verde-neon);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(46,204,113,0.4);
+    }
+    .btn-ios-dl {
+      background: var(--branco);
+      color: var(--preto);
+    }
+    .btn-ios-dl:hover {
+      background: #e8e8e8;
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(255,255,255,0.2);
+    }
+
+    /* =============================================
+       RODAPÉ
+       ============================================= */
+    footer {
+      background: #050505;
+      border-top: 1px solid var(--preto-borda);
+      padding: 60px 6% 30px;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1.2fr;
+      gap: 40px;
+      max-width: 1200px;
+      margin: 0 auto 48px;
+    }
+
+    .footer-brand .nav-logo { margin-bottom: 14px; }
+    .footer-brand p {
+      font-size: 0.88rem;
+      color: var(--cinza-texto);
+      line-height: 1.7;
+      max-width: 280px;
+      margin-bottom: 24px;
+    }
+
+    /* Redes sociais no rodapé */
+    .redes-sociais {
+      display: flex;
+      gap: 10px;
+    }
+    .rs-link {
+      width: 38px; height: 38px;
+      background: var(--preto-card);
+      border: 1px solid var(--preto-borda);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--cinza-texto);
+      font-size: 0.95rem;
+      transition: all 0.25s;
+    }
+    .rs-link:hover {
+      background: rgba(46,204,113,0.1);
+      border-color: var(--verde);
+      color: var(--verde);
+    }
+
+    .footer-col h4 {
+      font-family: var(--fonte-titulo);
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--branco);
+      margin-bottom: 18px;
+    }
+    .footer-col ul { display: flex; flex-direction: column; gap: 10px; }
+    .footer-col ul li a {
+      font-size: 0.88rem;
+      color: var(--cinza-texto);
+      transition: color 0.25s;
+    }
+    .footer-col ul li a:hover { color: var(--verde); }
+
+    .footer-bottom {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-top: 24px;
+      border-top: 1px solid var(--preto-borda);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      color: var(--cinza-texto);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .footer-bottom a { color: var(--verde); }
+
+    /* =============================================
+       BOTÃO FLUTUANTE WHATSAPP
+       ============================================= */
+    .wpp-float {
+      position: fixed;
+      bottom: 28px; right: 28px;
+      z-index: 999;
+      width: 58px; height: 58px;
+      background: #25d366;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem;
+      color: var(--branco);
+      box-shadow: 0 6px 24px rgba(37,211,102,0.5);
+      transition: transform 0.25s, box-shadow 0.25s;
+      animation: wpp-pulse 3s ease-in-out infinite;
+    }
+    @keyframes wpp-pulse {
+      0%, 100% { box-shadow: 0 6px 24px rgba(37,211,102,0.5); }
+      50% { box-shadow: 0 6px 36px rgba(37,211,102,0.8); }
+    }
+    .wpp-float:hover {
+      transform: scale(1.12);
+      box-shadow: 0 8px 32px rgba(37,211,102,0.7);
+    }
+
+    /* Tooltip no botão flutuante */
+    .wpp-float::before {
+      content: 'Falar no WhatsApp';
+      position: absolute;
+      right: 68px;
+      background: #1a1a1a;
+      color: var(--branco);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-family: var(--fonte-corpo);
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+    }
+    .wpp-float:hover::before { opacity: 1; }
+
+    /* =============================================
+       MENSAGEM DE SUCESSO DO FORMULÁRIO
+       ============================================= */
+    .mensagem-sucesso {
+      display: none;
+      background: rgba(46,204,113,0.1);
+      border: 1px solid var(--verde);
+      border-radius: var(--raio);
+      padding: 14px 18px;
+      color: var(--verde);
+      font-size: 0.9rem;
+      margin-top: 12px;
+      align-items: center;
+      gap: 10px;
+    }
+    .mensagem-sucesso.visivel { display: flex; }
+
+    /* =============================================
+       ANIMAÇÕES DE ENTRADA (Intersection Observer)
+       ============================================= */
+    .animar {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .animar.visivel {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .animar-delay-1 { transition-delay: 0.1s; }
+    .animar-delay-2 { transition-delay: 0.2s; }
+    .animar-delay-3 { transition-delay: 0.3s; }
+    .animar-delay-4 { transition-delay: 0.4s; }
+
+    /* =============================================
+       RESPONSIVIDADE – MOBILE
+       ============================================= */
+    @media (max-width: 900px) {
+      .nav-links {
+        position: fixed;
+        top: 74px; left: 0; right: 0;
+        background: rgba(10,10,10,0.97);
+        backdrop-filter: blur(16px);
+        flex-direction: column;
+        padding: 28px 6% 36px;
+        gap: 24px;
+        align-items: flex-start;
+        transform: translateY(-120%);
+        opacity: 0;
+        pointer-events: none;
+        transition: transform 0.35s ease, opacity 0.35s ease;
+        border-bottom: 1px solid var(--preto-borda);
+        z-index: 999;
+      }
+      .nav-links.aberto {
+        transform: translateY(0);
+        opacity: 1;
+        pointer-events: all;
+      }
+      .hamburger { display: flex; }
+      .btn-nav { display: none; }
+
+      .hero-conteudo {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+      .hero-botoes { justify-content: center; }
+      .hero-stats { justify-content: center; }
+      .card-flutuante { left: 50%; transform: translateX(-50%); bottom: -20px; }
+
+      .guincho-inner,
+      .motorista-inner,
+      .sobre-inner,
+      .contato-inner { grid-template-columns: 1fr; }
+
+      .form-linha { grid-template-columns: 1fr; }
+
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+
+      .sobre-texto .secao-titulo,
+      .sobre-texto .secao-subtitulo,
+      .motorista-info .secao-titulo,
+      .motorista-info .secao-subtitulo,
+      .sobre-texto .linha-deco,
+      .motorista-info .linha-deco { text-align: center; margin-left: auto; margin-right: auto; }
+
+      .beneficios { grid-template-columns: 1fr; }
+      .sobre-valores { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 540px) {
+      .footer-grid { grid-template-columns: 1fr; }
+      .hero-stats { flex-direction: column; gap: 16px; }
+      .download-botoes { flex-direction: column; align-items: center; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- =============================================
+       BOTÃO FLUTUANTE WHATSAPP
+       Troque o número 5500000000000 pelo número real
+       ============================================= -->
+  <a href="https://wa.me/5500000000000?text=Olá!%20Preciso%20do%20serviço%20de%20guincho." 
+     class="wpp-float" target="_blank" rel="noopener" aria-label="WhatsApp Guincho">
+    <i class="fab fa-whatsapp"></i>
+  </a>
+
+  <!-- =============================================
+       NAVBAR – barra de navegação principal
+       ============================================= -->
+  <nav id="navbar" role="navigation" aria-label="Menu principal">
+    <a href="#inicio" class="nav-logo">
+      <!-- 
+        LOGO: substitua a linha abaixo pela sua imagem real.
+        Exemplo: <img src="img/logo.png" alt="New Táxi" class="logo-img" />
+      -->
+      <div class="logo-fallback">NT</div>
+      New<span>Táxi</span>
+    </a>
+
+    <!-- Ícone hambúrguer para mobile -->
+    <div class="hamburger" id="hamburger" aria-label="Abrir menu" role="button" tabindex="0">
+      <span></span><span></span><span></span>
+    </div>
+
+    <!-- Links do menu -->
+    <ul class="nav-links" id="nav-links">
+      <li><a href="#inicio">Início</a></li>
+      <li><a href="#recursos">Recursos</a></li>
+      <li><a href="#guincho">Guincho</a></li>
+      <li><a href="#seja-motorista">Seja Motorista</a></li>
+      <li><a href="#sobre">Sobre Nós</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="#contato">Contato</a></li>
+      <li><a href="#download" class="btn-nav">Baixar App</a></li>
+    </ul>
+  </nav>
+
+  <!-- =============================================
+       HERO – seção de abertura / banner principal
+       ============================================= -->
+  <section id="inicio">
+    <div class="hero-conteudo">
+      <!-- Coluna esquerda: texto e botões -->
+      <div class="hero-texto">
+        <div class="hero-tag">
+          <i class="fas fa-circle"></i>
+          Disponível na sua cidade
+        </div>
+        <h1 class="hero-titulo">
+          Mobilidade urbana
+          <span class="destaque">na palma da sua mão</span>
+        </h1>
+        <p class="hero-desc">
+          Peça seu táxi em segundos, acompanhe em tempo real e chegue com segurança ao seu destino. 
+          A New Táxi conecta você aos melhores motoristas da região.
+        </p>
+        <!-- Botões de download: links reais do app -->
+        <div class="hero-botoes">
+          <a href="https://play.google.com/store/apps/details?id=br.com.taxinew.passenger.taximachine&pcampaignid=web_share"
+             class="btn-store btn-store-android" target="_blank" rel="noopener">
+            <i class="fab fa-google-play"></i>
+            <div>
+              <small>Disponível no</small>
+              <strong>Google Play</strong>
+            </div>
+          </a>
+          <a href="https://apps.apple.com/br/app/new-táxi-passageiro/id6471035661"
+             class="btn-store btn-store-ios" target="_blank" rel="noopener">
+            <i class="fab fa-apple"></i>
+            <div>
+              <small>Baixar na</small>
+              <strong>App Store</strong>
+            </div>
+          </a>
+        </div>
+        <!-- Estatísticas rápidas - edite os números conforme a realidade -->
+        <div class="hero-stats">
+          <div class="stat-item">
+            <strong>5K+</strong>
+            <span>Usuários ativos</span>
+          </div>
+          <div class="stat-item">
+            <strong>500+</strong>
+            <span>Motoristas</span>
+          </div>
+          <div class="stat-item">
+            <strong>4.9★</strong>
+            <span>Avaliação</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Coluna direita: imagem do banner/veículo -->
+      <div class="hero-imagem">
+        <!--
+          BANNER PRINCIPAL: substitua pelo caminho da sua imagem
+          Exemplo: <img src="img/banner.jpg" alt="New Táxi veículo" />
+        -->
+        <div class="hero-img-placeholder">
+          <i class="fas fa-car"></i>
+          <p>Substitua pelo seu banner<br><code>img/banner.jpg</code></p>
+        </div>
+        <!-- Card animado "motorista a caminho" -->
+        <div class="card-flutuante">
+          <div class="dot"></div>
+          <div>
+            <p>Motorista a caminho</p>
+            <small>Chegada estimada: 3 min</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================================
+       RECURSOS – por que escolher a New Táxi
+       ============================================= -->
+  <section id="recursos" class="secao">
+    <div class="linha-deco"></div>
+    <h2 class="secao-titulo">Por que escolher a <span>New Táxi?</span></h2>
+    <p class="secao-subtitulo">Conforto, segurança e tecnologia em cada viagem. Veja o que nos diferencia.</p>
+
+    <div class="grid-recursos">
+      <!-- Card 1 -->
+      <div class="card-recurso animar animar-delay-1">
+        <div class="icone-recurso"><i class="fas fa-map-marker-alt"></i></div>
+        <h3>Localização Precisa</h3>
+        <p>GPS em tempo real para você acompanhar cada detalhe da sua corrida. Motorista sempre no radar.</p>
+      </div>
+      <!-- Card 2 -->
+      <div class="card-recurso animar animar-delay-2">
+        <div class="icone-recurso"><i class="fas fa-shield-alt"></i></div>
+        <h3>Viagem Segura</h3>
+        <p>Motoristas verificados, avaliados pela comunidade e com documentação em dia. Sua segurança é prioridade.</p>
+      </div>
+      <!-- Card 3 -->
+      <div class="card-recurso animar animar-delay-3">
+        <div class="icone-recurso"><i class="fas fa-credit-card"></i></div>
+        <h3>Pagamento Fácil</h3>
+        <p>Pague com cartão, Pix ou dinheiro. Transações seguras e transparentes, sem taxas ocultas.</p>
+      </div>
+      <!-- Card 4 -->
+      <div class="card-recurso animar animar-delay-4">
+        <div class="icone-recurso"><i class="fas fa-bolt"></i></div>
+        <h3>Rapidez Garantida</h3>
+        <p>Táxi em minutos, onde você estiver. Frota ampla para atender sua demanda a qualquer hora do dia.</p>
+      </div>
+      <!-- Card 5 -->
+      <div class="card-recurso animar animar-delay-1">
+        <div class="icone-recurso"><i class="fas fa-headset"></i></div>
+        <h3>Suporte 24/7</h3>
+        <p>Nossa equipe está sempre disponível para resolver qualquer situação durante ou após a viagem.</p>
+      </div>
+      <!-- Card 6 -->
+      <div class="card-recurso animar animar-delay-2">
+        <div class="icone-recurso"><i class="fas fa-star"></i></div>
+        <h3>Motoristas Avaliados</h3>
+        <p>Sistema de avaliação mútua para garantir a melhor experiência para passageiros e motoristas.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================================
+       COMO FUNCIONA – passo a passo do app
+       ============================================= -->
+  <section id="como-funciona" class="secao">
+    <div class="linha-deco"></div>
+    <h2 class="secao-titulo">Como <span>funciona?</span></h2>
+    <p class="secao-subtitulo">Em apenas 4 passos simples você já está dentro do carro.</p>
+
+    <div class="grid-passos">
+      <div class="passo animar animar-delay-1">
+        <div class="passo-numero">1</div>
+        <h3>Baixe o App</h3>
+        <p>Disponível gratuitamente na App Store e Google Play.</p>
+      </div>
+      <div class="passo animar animar-delay-2">
+        <div class="passo-numero">2</div>
+        <h3>Crie sua Conta</h3>
+        <p>Cadastro rápido com nome, telefone e e-mail. Pronto em segundos.</p>
+      </div>
+      <div class="passo animar animar-delay-3">
+        <div class="passo-numero">3</div>
+        <h3>Solicite a Corrida</h3>
+        <p>Informe seu destino e escolha o tipo de veículo desejado.</p>
+      </div>
+      <div class="passo animar animar-delay-4">
+        <div class="passo-numero">4</div>
+        <h3>Viaje com Conforto</h3>
+        <p>Acompanhe o motorista em tempo real e aproveite a viagem.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================================
+       GUINCHO – seção de destaque do serviço de guincho
+       ============================================= -->
+  <section id="guincho" class="secao">
+    <div class="guincho-inner">
+      <!-- Coluna esquerda: texto e CTA -->
+      <div class="guincho-texto">
+        <div class="guincho-badge">
+          <i class="fas fa-truck-pickup"></i>
+          Serviço de Guincho
+        </div>
+        <h2 class="guincho-titulo">Seu carro parou?<br>A gente <span>te resgata!</span></h2>
+        <p class="guincho-desc">
+          Além do transporte por aplicativo, a New Táxi oferece serviço de guincho rápido e confiável. 
+          Pane seca, acidente, pneu furado — estamos prontos para te atender 24 horas por dia.
+        </p>
+        <ul class="guincho-lista">
+          <li><i class="fas fa-check-circle"></i> Atendimento 24h, todos os dias</li>
+          <li><i class="fas fa-check-circle"></i> Chegada rápida em qualquer ponto da cidade</li>
+          <li><i class="fas fa-check-circle"></i> Equipe treinada e equipamentos modernos</li>
+          <li><i class="fas fa-check-circle"></i> Transporte seguro para qualquer oficina</li>
+          <li><i class="fas fa-check-circle"></i> Orçamento sem compromisso</li>
+        </ul>
+        <!-- 
+          BOTÃO WHATSAPP GUINCHO
+          Troque o número pelo número real do serviço de guincho
+        -->
+        <a href="https://wa.me/5500000000000?text=Olá!%20Preciso%20do%20serviço%20de%20guincho.%20Pode%20me%20ajudar?"
+           class="btn-wpp" target="_blank" rel="noopener">
+          <i class="fab fa-whatsapp"></i>
+          Chamar Guincho pelo WhatsApp
+        </a>
+      </div>
+
+      <!-- Coluna direita: imagem do guincho -->
+      <div class="guincho-imagem">
+        <!--
+          IMAGEM DO GUINCHO: substitua pelo caminho da imagem real
+          Exemplo: <img src="img/guincho.jpg" alt="Serviço de Guincho New Táxi" />
+        -->
+        <div class="guincho-img-placeholder">
+          <i class="fas fa-truck-pickup"></i>
+          <p>Substitua pela imagem do guincho<br><code>img/guincho.jpg</code></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================================
+       SEJA MOTORISTA – formulário de cadastro
+       ============================================= -->
+  <section id="seja-motorista" class="secao">
+    <div class="motorista-inner">
+      <!-- Coluna esquerda: benefícios -->
+      <div class="motorista-info">
+        <div class="linha-deco"></div>
+        <h2 class="secao-titulo">Seja um motorista <span>parceiro</span></h2>
+        <p class="secao-subtitulo">
+          Ganhe dinheiro dirigindo no seu próprio horário. Autonomia e renda extra com a New Táxi.
+        </p>
+        <div class="beneficios">
+          <div class="beneficio-item">
+            <i class="fas fa-clock"></i>
+            <span>Horário flexível, você decide quando trabalhar</span>
+          </div>
+          <div class="beneficio-item">
+            <i class="fas fa-wallet"></i>
+            <span>Ganhos semanais direto na sua conta</span>
+          </div>
+          <div class="beneficio-item">
+            <i class="fas fa-headset"></i>
+            <span>Suporte dedicado para motoristas parceiros</span>
+          </div>
+          <div class="beneficio-item">
+            <i class="fas fa-chart-line"></i>
+            <span>Bônus por metas e avaliações positivas</span>
+          </div>
+          <div class="beneficio-item">
+            <i class="fas fa-mobile-alt"></i>
+            <span>App intuitivo e fácil de usar</span>
+          </div>
+          <div class="beneficio-item">
+            <i class="fas fa-users"></i>
+            <span>Comunidade ativa de motoristas parceiros</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Coluna direita: formulário -->
+      <div class="form-motorista">
+        <h3>Quero ser motorista</h3>
+        <p>Preencha os dados abaixo e entraremos em contato.</p>
+
+        <!--
+          FORMULÁRIO DE CADASTRO MOTORISTA
+          Integre com seu backend ou serviço de e-mail (ex: Formspree, EmailJS)
+          Substitua o action="#" pelo endpoint do seu formulário
+        -->
+        <form id="form-cad-motorista" action="#" method="POST" novalidate>
+          <div class="form-linha">
+            <div class="form-grupo">
+              <label for="mot-nome">Nome completo *</label>
+              <input type="text" id="mot-nome" name="nome" placeholder="Seu nome" required />
+            </div>
+            <div class="form-grupo">
+              <label for="mot-telefone">WhatsApp *</label>
+              <input type="tel" id="mot-telefone" name="telefone" placeholder="(00) 00000-0000" required />
+            </div>
+          </div>
+          <div class="form-grupo">
+            <label for="mot-email">E-mail *</label>
+            <input type="email" id="mot-email" name="email" placeholder="seu@email.com" required />
+          </div>
+          <div class="form-linha">
+            <div class="form-grupo">
+              <label for="mot-cnh">Categoria da CNH *</label>
+              <select id="mot-cnh" name="cnh" required>
+                <option value="">Selecione</option>
+                <option value="B">Categoria B</option>
+                <option value="C">Categoria C</option>
+                <option value="D">Categoria D</option>
+                <option value="E">Categoria E</option>
+              </select>
+            </div>
+            <div class="form-grupo">
+              <label for="mot-veiculo">Tipo de veículo</label>
+              <select id="mot-veiculo" name="veiculo">
+                <option value="">Selecione</option>
+                <option value="sedan">Sedan</option>
+                <option value="hatch">Hatch</option>
+                <option value="suv">SUV</option>
+                <option value="van">Van / Minivan</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grupo">
+            <label for="mot-cidade">Cidade onde vai trabalhar *</label>
+            <input type="text" id="mot-cidade" name="cidade" placeholder="Sua cidade" required />
+          </div>
+          <button type="submit" class="btn-primario">
+            <i class="fas fa-paper-plane"></i> Enviar cadastro
+          </button>
+          <!-- Mensagem de sucesso exibida após envio -->
+          <div class="mensagem-sucesso" id="sucesso-motorista">
+            <i class="fas fa-check-circle"></i>
+            Cadastro enviado! Em breve entraremos em contato.
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================================
+       SOBRE NÓS
+       ============================================= -->
+  <section id="sobre" class="secao">
+    <div class="sobre-inner">
+      <!-- Coluna esquerda: texto -->
+      <div class="sobre-texto">
+        <div class="linha-deco"></div>
+        <h2 class="secao-titulo">Sobre a <span>New Táxi</span></h2>
+        <p class="secao-subtitulo">
+          Nascemos com uma missão: transformar a mobilidade urbana com tecnologia, segurança e humanidade.
+        </p>
+        <p style="color: var(--cinza-texto); line-height: 1.8; font-size: 0.98rem; margin-bottom: 16px;">
+          <!-- Edite este texto com a história real da empresa -->
+          A New Táxi surgiu do desejo de oferecer um serviço de transporte por aplicativo de qualidade, 
+          com foco na experiência do passageiro e na valorização do motorista parceiro.
+        </p>
+        <p style="color: var(--cinza-texto); line-height: 1.8; font-size: 0.98rem;">
+          Combinamos tecnologia moderna com a tradição e confiança do táxi, entregando rapidez, 
+          segurança e conforto para toda a comunidade.
+        </p>
+        <!-- Valores da empresa -->
+        <div class="sobre-valores">
+          <div class="valor-item">
+            <i class="fas fa-heart"></i>
+            <h4>Compromisso</h4>
+            <p>Com cada corrida, colocamos sua satisfação em primeiro lugar.</p>
+          </div>
+          <div class="valor-item">
+            <i class="fas fa-handshake"></i>
+            <h4>Confiança</h4>
+            <p>Transparência em cada etapa, da corrida ao pagamento.</p>
+          </div>
+          <div class="valor-item">
+            <i class="fas fa-leaf"></i>
+            <h4>Inovação</h4>
+            <p>Tecnologia em constante evolução para melhorar sua experiência.</p>
+          </div>
+          <div class="valor-item">
+            <i class="fas fa-users"></i>
+            <h4>Comunidade</h4>
+            <p>Valorizamos motoristas e passageiros como parte da nossa família.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Coluna direita: imagem -->
+      <div class="sobre-imagem animar">
+        <!--
+          IMAGEM SOBRE NÓS: substitua pelo caminho da imagem real
+          Exemplo: <img src="img/sobre.jpg" alt="Equipe New Táxi" />
+        -->
+        <div class="sobre-img-placeholder">
+          <i class="fas fa-users"></i>
+          <p>Substitua pela imagem da equipe<br><code>img/sobre.jpg</code></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================================
+       FAQ – perguntas frequentes (accordion)
+       ============================================= -->
+  <section id="faq" class="secao">
+    <div class="linha-deco"></div>
+    <h2 class="secao-titulo">Perguntas <span>Frequentes</span></h2>
+    <p class="secao-subtitulo">Tiramos as dúvidas mais comuns sobre o app e nossos serviços.</p>
+
+    <div class="faq-lista">
+      <!-- Item FAQ – clique para abrir/fechar -->
+      <div class="faq-item">
+        <button class="faq-pergunta">
+          Como faço para baixar o aplicativo?
+          <i class="fas fa-plus"></i>
+        </button>
+        <div class="faq-resposta">
+          <p>É simples! Acesse a App Store (iPhone) ou Google Play (Android), pesquise por "New Táxi Passageiro" e toque em instalar. O download é gratuito e o cadastro leva menos de 2 minutos.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-pergunta">
+          Quais formas de pagamento são aceitas?
+          <i class="fas fa-plus"></i>
+        </button>
+        <div class="faq-resposta">
+          <p>Aceitamos cartão de crédito e débito (Visa, Mastercard), Pix e dinheiro em espécie. O método de pagamento pode ser escolhido no momento da solicitação da corrida diretamente pelo app.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-pergunta">
+          Como funciona o serviço de guincho?
+          <i class="fas fa-plus"></i>
+        </button>
+        <div class="faq-resposta">
+          <p>Nosso serviço de guincho é acionado diretamente pelo WhatsApp. Basta clicar no botão de contato, informar sua localização e descrever o problema. Nossa equipe atende 24h por dia, todos os dias da semana.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-pergunta">
+          Posso cancelar uma corrida depois de solicitar?
+          <i class="fas fa-plus"></i>
+        </button>
+        <div class="faq-resposta">
+          <p>Sim, você pode cancelar a corrida diretamente pelo aplicativo antes do motorista chegar. Cancelamentos antes da aceitação do motorista são gratuitos. Consulte a política completa dentro do app.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-pergunta">
+          Quais documentos preciso para me cadastrar como motorista?
+          <i class="fas fa-plus"></i>
+        </button>
+        <div class="faq-resposta">
+          <p>Você precisará de CNH categoria B ou superior, documento do veículo (CRLV), comprovante de residência, foto do veículo e selfie com documento. O processo é 100% digital e nossa equipe analisa em até 48h úteis.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-pergunta">
+          O app funciona em quais cidades?
+          <i class="fas fa-plus"></i>
+        </button>
+        <div class="faq-resposta">
+          <!-- Edite com as cidades reais de atuação -->
+          <p>Atualmente operamos nas principais cidades da região. Consulte a disponibilidade diretamente no aplicativo informando sua localização. Estamos em constante expansão para novas cidades!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================================
+       CONTATO
+       ============================================= -->
+  <section id="contato" class="secao">
+    <div class="linha-deco"></div>
+    <h2 class="secao-titulo">Entre em <span>Contato</span></h2>
+    <p class="secao-subtitulo">Tem dúvidas, sugestões ou quer falar com nossa equipe? Estamos aqui!</p>
+
+    <div class="contato-inner">
+      <!-- Coluna esquerda: canais de contato -->
+      <div class="contato-info">
+        <h3>Fale conosco</h3>
+        <p>Nossa equipe de suporte está disponível para ajudar você da melhor forma possível.</p>
+        <div class="contato-canais">
+          <!--
+            CANAIS DE CONTATO: edite os números e e-mails reais abaixo
+          -->
+          <a href="https://wa.me/5500000000000" class="canal-item" target="_blank" rel="noopener">
+            <div class="canal-icone"><i class="fab fa-whatsapp"></i></div>
+            <div class="canal-texto">
+              <strong>WhatsApp</strong>
+              <span>(00) 00000-0000 – Atendimento geral</span>
+            </div>
+          </a>
+          <a href="tel:+5500000000000" class="canal-item">
+            <div class="canal-icone"><i class="fas fa-phone"></i></div>
+            <div class="canal-texto">
+              <strong>Telefone</strong>
+              <span>(00) 0000-0000</span>
+            </div>
+          </a>
+          <a href="mailto:contato@newtaxi.com.br" class="canal-item">
+            <div class="canal-icone"><i class="fas fa-envelope"></i></div>
+            <div class="canal-texto">
+              <strong>E-mail</strong>
+              <span>contato@newtaxi.com.br</span>
+            </div>
+          </a>
+          <div class="canal-item">
+            <div class="canal-icone"><i class="fas fa-clock"></i></div>
+            <div class="canal-texto">
+              <strong>Horário de Atendimento</strong>
+              <span>Segunda a domingo, 24 horas</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Coluna direita: formulário de contato -->
+      <div class="form-contato">
+        <h3>Envie uma mensagem</h3>
+        <!--
+          FORMULÁRIO DE CONTATO
+          Integre com Formspree, EmailJS ou backend próprio
+        -->
+        <form id="form-contato" action="#" method="POST" novalidate>
+          <div class="form-linha">
+            <div class="form-grupo">
+              <label for="ct-nome">Nome *</label>
+              <input type="text" id="ct-nome" name="nome" placeholder="Seu nome" required />
+            </div>
+            <div class="form-grupo">
+              <label for="ct-telefone">Telefone</label>
+              <input type="tel" id="ct-telefone" name="telefone" placeholder="(00) 00000-0000" />
+            </div>
+          </div>
+          <div class="form-grupo">
+            <label for="ct-email">E-mail *</label>
+            <input type="email" id="ct-email" name="email" placeholder="seu@email.com" required />
+          </div>
+          <div class="form-grupo">
+            <label for="ct-assunto">Assunto</label>
+            <select id="ct-assunto" name="assunto">
+              <option value="">Selecione o assunto</option>
+              <option value="corrida">Problema com corrida</option>
+              <option value="guincho">Serviço de guincho</option>
+              <option value="motorista">Quero ser motorista</option>
+              <option value="pagamento">Pagamento</option>
+              <option value="outro">Outro assunto</option>
+            </select>
+          </div>
+          <div class="form-grupo">
+            <label for="ct-mensagem">Mensagem *</label>
+            <textarea id="ct-mensagem" name="mensagem" placeholder="Descreva sua dúvida ou sugestão..." required></textarea>
+          </div>
+          <button type="submit" class="btn-primario">
+            <i class="fas fa-paper-plane"></i> Enviar mensagem
+          </button>
+          <div class="mensagem-sucesso" id="sucesso-contato">
+            <i class="fas fa-check-circle"></i>
+            Mensagem enviada com sucesso! Responderemos em breve.
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================================
+       DOWNLOAD APP – banner de chamada para ação final
+       ============================================= -->
+  <section id="download">
+    <div class="linha-deco"></div>
+    <h2 class="secao-titulo">Baixe agora e <span>comece a viajar</span></h2>
+    <p class="secao-subtitulo">
+      Sua primeira corrida está a um download de distância. Disponível para Android e iOS, gratuitamente.
+    </p>
+    <div class="download-botoes">
+      <!-- Link Play Store – use o link real do app -->
+      <a href="https://play.google.com/store/apps/details?id=br.com.taxinew.passenger.taximachine&pcampaignid=web_share"
+         class="btn-download btn-android-dl" target="_blank" rel="noopener">
+        <i class="fab fa-google-play"></i>
+        <div>
+          <small>Disponível no</small>
+          <strong>Google Play</strong>
+        </div>
+      </a>
+      <!-- Link App Store – use o link real do app -->
+      <a href="https://apps.apple.com/br/app/new-táxi-passageiro/id6471035661"
+         class="btn-download btn-ios-dl" target="_blank" rel="noopener">
+        <i class="fab fa-apple"></i>
+        <div>
+          <small>Baixar na</small>
+          <strong>App Store</strong>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- =============================================
+       RODAPÉ
+       ============================================= -->
+  <footer>
+    <div class="footer-grid">
+      <!-- Coluna brand -->
+      <div class="footer-brand">
+        <div class="nav-logo">
+          <div class="logo-fallback">NT</div>
+          New<span>Táxi</span>
+        </div>
+        <!-- Edite a descrição e cidade -->
+        <p>Transporte seguro, rápido e confiável na palma da sua mão. A mobilidade urbana que você merece.</p>
+        <!-- Redes sociais – edite os links -->
+        <div class="redes-sociais">
+          <a href="#" class="rs-link" aria-label="Instagram" target="_blank"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="rs-link" aria-label="Facebook" target="_blank"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="rs-link" aria-label="TikTok" target="_blank"><i class="fab fa-tiktok"></i></a>
+          <a href="https://wa.me/5500000000000" class="rs-link" aria-label="WhatsApp" target="_blank"><i class="fab fa-whatsapp"></i></a>
+        </div>
+      </div>
+
+      <!-- Coluna navegação -->
+      <div class="footer-col">
+        <h4>Navegação</h4>
+        <ul>
+          <li><a href="#inicio">Início</a></li>
+          <li><a href="#recursos">Recursos</a></li>
+          <li><a href="#como-funciona">Como Funciona</a></li>
+          <li><a href="#sobre">Sobre Nós</a></li>
+        </ul>
+      </div>
+
+      <!-- Coluna serviços -->
+      <div class="footer-col">
+        <h4>Serviços</h4>
+        <ul>
+          <li><a href="#guincho">Guincho</a></li>
+          <li><a href="#seja-motorista">Seja Motorista</a></li>
+          <li><a href="#faq">FAQ</a></li>
+          <li><a href="#contato">Suporte</a></li>
+        </ul>
+      </div>
+
+      <!-- Coluna download -->
+      <div class="footer-col">
+        <h4>Baixe o App</h4>
+        <ul>
+          <li>
+            <a href="https://play.google.com/store/apps/details?id=br.com.taxinew.passenger.taximachine&pcampaignid=web_share" target="_blank" rel="noopener">
+              <i class="fab fa-google-play" style="margin-right: 6px; color: var(--verde);"></i> Google Play
+            </a>
+          </li>
+          <li>
+            <a href="https://apps.apple.com/br/app/new-táxi-passageiro/id6471035661" target="_blank" rel="noopener">
+              <i class="fab fa-apple" style="margin-right: 6px; color: var(--verde);"></i> App Store
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Linha inferior do rodapé -->
+    <div class="footer-bottom">
+      <span>© 2026 New Táxi. Todos os direitos reservados.</span>
+      <span>Desenvolvido com <span style="color:var(--verde);">♥</span> para mobilidade urbana</span>
+    </div>
+  </footer>
+
+  <!-- =============================================
+       JAVASCRIPT – interatividade da página
+       ============================================= -->
+  <script>
+    // =============================================
+    // MENU HAMBÚRGUER – abre/fecha no mobile
+    // =============================================
+    const hamburger = document.getElementById('hamburger');
+    const navLinks  = document.getElementById('nav-links');
+
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('aberto');
+      navLinks.classList.toggle('aberto');
+    });
+
+    // Fecha o menu ao clicar em um link
+    document.querySelectorAll('.nav-links a').forEach(link => {
+      link.addEventListener('click', () => {
+        hamburger.classList.remove('aberto');
+        navLinks.classList.remove('aberto');
+      });
+    });
+
+    // =============================================
+    // DESTACAR LINK ATIVO NA NAVBAR AO ROLAR
+    // =============================================
+    const secoes = document.querySelectorAll('section[id]');
+    const links  = document.querySelectorAll('.nav-links a');
+
+    window.addEventListener('scroll', () => {
+      let posAtual = window.scrollY + 100;
+      secoes.forEach(sec => {
+        if (posAtual >= sec.offsetTop && posAtual < sec.offsetTop + sec.offsetHeight) {
+          links.forEach(l => l.classList.remove('ativo'));
+          const link = document.querySelector(`.nav-links a[href="#${sec.id}"]`);
+          if (link) link.classList.add('ativo');
+        }
+      });
+    });
+
+    // =============================================
+    // ANIMAÇÕES DE ENTRADA – Intersection Observer
+    // Elementos com classe .animar surgem ao entrar na tela
+    // =============================================
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visivel');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.animar').forEach(el => observer.observe(el));
+
+    // =============================================
+    // FAQ – accordion: abre/fecha perguntas
+    // =============================================
+    document.querySelectorAll('.faq-pergunta').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item  = btn.parentElement;
+        const aberto = item.classList.contains('aberto');
+        // Fecha todos os itens abertos
+        document.querySelectorAll('.faq-item.aberto').forEach(i => i.classList.remove('aberto'));
+        // Abre o clicado (se não estava aberto)
+        if (!aberto) item.classList.add('aberto');
+      });
+    });
+
+    // =============================================
+    // FORMULÁRIO MOTORISTA – simula envio e exibe sucesso
+    // Para integrar de verdade: substitua o action do form
+    // ou use fetch() com uma API (Formspree, EmailJS, etc.)
+    // =============================================
+    document.getElementById('form-cad-motorista').addEventListener('submit', function(e) {
+      e.preventDefault();
+      // Aqui você pode integrar com backend ou Formspree
+      document.getElementById('sucesso-motorista').classList.add('visivel');
+      this.reset();
+    });
+
+    // =============================================
+    // FORMULÁRIO CONTATO – simula envio e exibe sucesso
+    // =============================================
+    document.getElementById('form-contato').addEventListener('submit', function(e) {
+      e.preventDefault();
+      // Aqui você pode integrar com backend ou Formspree
+      document.getElementById('sucesso-contato').classList.add('visivel');
+      this.reset();
+    });
+  </script>
+
+</body>
+</html>
