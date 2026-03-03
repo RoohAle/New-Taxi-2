@@ -398,7 +398,7 @@ ul {
     border-radius: 20px;
     box-shadow: var(--sombra);
     object-fit: cover;
-    max-height: 520px;
+    max-height: 620px;
 }
 
 /* Placeholder quando sem imagem */
